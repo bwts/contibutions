@@ -1,13 +1,14 @@
 <?php
 
-/**
- * Root directory of Drupal installation.
- */
-define('DRUPAL_ROOT', getcwd());
-
-include_once DRUPAL_ROOT . '/includes/bootstrap.inc';
-drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-
+#/**
+# * Root directory of Drupal installation.
+# */
+#define('DRUPAL_ROOT', getcwd());
+#
+#include_once DRUPAL_ROOT . '/includes/bootstrap.inc';
+#drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
+#
+require_once 'bootDrupal.php';
 // echo variable_get('autologout_timeout') . PHP_EOL;
 
 // locale_add_language('it', $name = 'Italian', $native = 'Italiano', $direction = LANGUAGE_LTR, $domain = '', $prefix = '', $enabled = TRUE, $default = FALSE);
