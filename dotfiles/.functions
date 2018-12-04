@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+LIBBASE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. "$LIBBASE/environment/scripts/lib/logger.sh"
+
+# -------------------
+# -   temporarly    -
+# -------------------
+function abwts(){
+#  getDefaultDir ${1}
+  file="./build/sites/default/"
+#  if [ ! -f "${file}" ]; then
+#     echo "File does not exist or you need to change directory!"
+#     exit
+#   fi
+
+   dperm ${file} 
+}
+
+# -------------------
+#  Set tmgmt Languages and translators.
+# -------------------
+function setTmgmt(){
+   info "Set up tmgmt"
+   if [ ! -z ${1} ]; then
+     cp -ap ~/environment/sites/bwts_tools/contibutions/tmgmt_tools ~/environment/sites/${1}/build/
+     info "File copied into build folder!"
+     return 1
+  fi
+   error "Missing root folder name!"
+}
+
+# ---------------------------------------------
+# -     FREE MEMORY ON C9
+# ---------------------------------------------
+function freeSpace() {
+ eval docker rm $(docker ps -q -f status=exited)
+ eval docker system prune --all
+ eval docker volume prune
+}
+
+# ---------------------------------------
+# - Create a new directory and enter it
+# ---------------------------------------
+ function mkd() {
+    mkdir -p "$@" && cd "$_";
+ }
+
+# ----------------------------------------
+# - Create a new directory and enter it
+# ----------------------------------------
+ function assume_unchange() {
+   git update-index --assume-unchanged ${1};
+ }
+
+
+# --------------------------------------------------------
+# -         FILE PERMISSION
+# ---------------------------------------------------------
+  function dperm() {
+#    file=${1}
+    file="./build/sites/default/"
+    eval sudo chmod -R 777 ${file}
+  }
+
+  function readExecutedperm() {
+ #   file=${1}
+    file="./build/sites/default/"
+    eval sudo chmod -R 554 ${file}
+  }
+
+# ------------------------------
+#    CONFIGURATIONS PLATFORM
+# ------------------------------
+
+# --------------------------------------------
+# - Set configuration settings for VARNISH
+# --------------------------------------------
+
+# -------------------------------
+# -       VARNISH SETTINGS      -
+# -------------------------------
+function setVarnish() {                                                                                   
+  #file=$(getDefaultDir ${1})
+  file="./build/sites/default/"
+  dperm $file
+  # Varnish configuration                                                                                 
+  eval cat >> /home/ec2-user/environment/sites/${1}/build/sites/default/settings.php <<eol             
+  
+// ALM testing varnish                                                                                  
+  \$conf['nexteuropa_varnish_request_user'] = 'admin';                                                    
+  \$conf['nexteuropa_varnish_request_password'] = 'admin';                                                
+  \$conf['nexteuropa_varnish_http_targets'] = 'a';                                                        
+  \$conf['nexteuropa_varnish_tag'] = 'a';                                                                 
+  \$conf['nexteuropa_varnish_request_method'] = 'a';                                                      
+  \$conf['nexteuropa_varnish_http_timeout'] = 111111111;
+eol
+   # Remove write perm
+   readExecutedperm ${file}
+}
+
+# ---------------------------------------------------
+#    Setting up ECAS CONFIG. SETTINGS
+# ---------------------------------------------------
+function setEcas(){
+    # Write permission
+   # file=$(getDefaultDir ${1})
+    file="./build/sites/default/"
+    warn "---> ${file}"
+    dperm ${file}
+    # dperm
+    cat >> ${file}/settings.php <<EOL
+
+ # Setting up ECAS
+ // ALM testing ECAS
+	 define('FPFIS_ECAS_URL', 'ecas.ec.europa.eu');
+	 define('FPFIS_ECAS_PORT', 443);    
+	 define('FPFIS_ECAS_URI', '/cas');
+EOL
+
+     # REMOVE Write permission
+     readExecutedperm ${file}
+}
+
+# ---------------------------------------------------
+#    Setting up POETRY CONFIG. SETTINGS
+# ---------------------------------------------------
+function setPoetry(){
+   # file=$(getDefaultDir ${1})
+   file="./build/sites/default/"
+   dperm ${file}
+   cat >> ${file}/settings.php <<EOL
+    
+ # Setting up Poetry
+ // ALM testing POETRY
+    \$conf['poetry_service'] = array(
+      'address' => 'http://intragate.test.ec.europa.eu/DGT/poetry_services/components/poetry.cfc?wsdl',
+      'method' => 'requestService',
+    );
+EOL
+
+    # REMOVE Write permission
+    readExecutedperm ${file}
+}
+
+# ---------------------------------------------------
+#    Setting up BASE URL CONFIG. SETTINGS
+#    CLoud 9 friendly url
+#--------------------------------------------
+function baseurl(){
+  # file=$(getDefaultDir ${1})
+  file="./build/sites/default/"
+  dperm ${file}
+  # eval dperm 
+  basepath=${pwd}
+  cat >> ${file}/settings.php <<EOL
+ 
+  # Setting up BASE URL to allow using frp URL on c9
+  // ALM testing frp URL for c9
+     \$base_url="https://devs-limaari.c9.fpfis.tech.ec.europa.eu";
+EOL
+    
+  # REMOVE Write permission
+  readExecutedperm ${file}
+}
+
+
