@@ -1,0 +1,35 @@
+<?php
+
+function bwts_fields_install() {
+  // Create field base for "Case Study" content type field.
+  module_load_include('inc', 'bwts_fields', 'includes/bwts_fields.field_base');
+  $field_bases = bwts_fields_field_default_field_bases();
+
+  foreach ($field_bases as $field_info) {
+    field_create_field($field_info);
+  }
+
+  module_load_include('inc', 'bwts_fields', 'includes/bwts_fields.field_instance');
+  $field_instances = bwts_fields_field_default_field_instances();
+  // Create field instances:
+  foreach ($field_instances as $instance) {
+    field_create_instance($instance);
+  }
+
+  //set up the user fields
+  $user = array(
+    'name' => 'alm',
+    'mail' => 'user_name@example.com',
+    'pass' => 'password2018',
+    'status' => 1,
+    'init' => 'email address',
+    'roles' => array(
+      DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+      5 => 'cem',
+    ),
+  );
+
+  //the first parameter is left blank so a new user is created
+  $account = user_save('', $user);
+  print_r($account);
+}
