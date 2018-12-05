@@ -29,7 +29,7 @@ foreach($languages as $code => $lang) {
 	if (!in_array($code, $code_lang)) {
 		$native = $lang[1];
 		locale_add_language($code, $name, $native  , $direction = LANGUAGE_LTR, $domain = '', $prefix = '', $enabled = TRUE, $default = FALSE);
-	    echo $name . 'added' . PHP_EOL; 
+	    echo $name . ' added!' . PHP_EOL; 
 	} else {
 		echo 'Language "' . $name . '" has been already created! ' . PHP_EOL;
 
